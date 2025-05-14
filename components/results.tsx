@@ -345,7 +345,7 @@ export default function ResultsPage() {
                     <h3 className="text-xl font-semibold mb-3 flex items-center">
                       <Icon
                         icon="mdi:check-circle"
-                        className="size-12 mr-2 text-green-500"
+                        className="size-6 mr-2 text-green-500"
                       />
                       Points forts
                     </h3>
@@ -363,7 +363,7 @@ export default function ResultsPage() {
                     <h3 className="text-xl font-semibold mb-3 flex items-center">
                       <Icon
                         icon="mdi:alert-circle"
-                        className="mr-2 size-12 text-amber-500"
+                        className="mr-2 size-6 text-amber-500"
                       />
                       Points à améliorer
                     </h3>
@@ -381,7 +381,7 @@ export default function ResultsPage() {
                     <h3 className="text-xl font-semibold mb-3 flex items-center">
                       <Icon
                         icon="mdi:lightbulb"
-                        className="mr-2 size-12 text-blue-500"
+                        className="mr-2 size-6 text-blue-500"
                       />
                       Conseils personnalisés
                     </h3>
