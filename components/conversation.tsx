@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { AnimatedShinyText } from "./animated-shiny-text";
 
 interface ConversationProps {
   interviewType: string;
@@ -54,8 +55,8 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
     if (!conversationStarted && !initializing) stopTimer();
   }, [conversationStarted, initializing]);
 
-  // Animation controls for the speaking animation
-  const animationControls = useAnimationControls();
+  // Animation controls for the status text
+  const statusTextControls = useAnimationControls();
 
   const conversation = useConversation({
     onConnect: () => {
@@ -76,14 +77,6 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
       setConversationStarted(false);
       // Stop timer when conversation ends
       stopTimer();
-
-      // Reset animation to normal state
-      animationControls.start({
-        scale: 1,
-        x: 0,
-        y: 0,
-        transition: { duration: 0.2 },
-      });
 
       // We'll handle showing the dialog in the stopConversation function now
       // This onDisconnect handler will still catch automatic disconnections
@@ -372,21 +365,13 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
     stopTimer();
     setConversationStarted(false);
 
-    // Reset animation to normal state
-    animationControls.start({
-      scale: 1,
-      x: 0,
-      y: 0,
-      transition: { duration: 0.2 },
-    });
-
     // If we have a valid conversation ID, set it and show the dialog
     if (currentConversationId) {
       setConversationId(currentConversationId);
       // Always show the synthesis dialog when manually stopping, regardless of time
       setShowSynthesisDialog(true);
     }
-  }, [conversation, animationControls]);
+  }, [conversation]);
 
   // Initialize everything once on component mount
   useEffect(() => {
@@ -430,42 +415,22 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
     };
   }, []); // Empty dependency array - run only once on mount
 
-  // Effect for handling the speaking animation
+  // Effect for managing status text visibility
   useEffect(() => {
-    let animationInterval: NodeJS.Timeout | null = null;
-
     if (conversation.isSpeaking && conversationStarted) {
-      // Start random animation when speaking - faster and more random
-      animationInterval = setInterval(() => {
-        // Generate more extreme random scale between 0.7 and 1.5
-        const randomScale = 0.7 + Math.random() * 0.8;
-        // Faster transitions with random durations
-        animationControls.start({
-          scale: randomScale,
-          x: (Math.random() - 0.5) * 8, // slight random horizontal movement
-          y: (Math.random() - 0.5) * 8, // slight random vertical movement
-          transition: {
-            duration: 0.2 + Math.random() * 0.3,
-            ease: ["easeIn", "easeOut", "circIn", "circOut"][
-              Math.floor(Math.random() * 4)
-            ],
-          },
-        });
-      }, 200); // Twice as fast update interval
-    } else {
-      // Reset to normal size when not speaking
-      animationControls.start({
-        scale: 1,
-        x: 0,
+      statusTextControls.start({
+        opacity: 1,
         y: 0,
-        transition: { duration: 0.2 },
+        transition: { duration: 0.3 },
+      });
+    } else {
+      statusTextControls.start({
+        opacity: 0,
+        y: 10,
+        transition: { duration: 0.3 },
       });
     }
-
-    return () => {
-      if (animationInterval) clearInterval(animationInterval);
-    };
-  }, [conversation.isSpeaking, conversationStarted, animationControls]);
+  }, [conversation.isSpeaking, conversationStarted, statusTextControls]);
 
   // Get interview type label
   const getInterviewTypeLabel = () => {
@@ -477,6 +442,11 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
       default:
         return "Entretien";
     }
+  };
+
+  // Get interviewer name based on interview type
+  const getInterviewerName = () => {
+    return interviewType === "corporate" ? "Lisa" : "Julien";
   };
 
   return (
@@ -506,52 +476,65 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl px-4">
           {/* Left card - EDHEC branded background */}
           <Card
-            className="overflow-hidden h-[450px]"
+            className="overflow-hidden h-[450px] relative"
             style={{ backgroundColor: "#A02235" }}
           >
+            {/* EDHEC Logo positioned absolutely on top left */}
+            <div className="absolute top-6 left-6 w-28">
+              <img
+                src="https://campus.online.edhec.edu/img/logo-white.95a2217.png"
+                alt="EDHEC Logo"
+                className="w-full"
+              />
+            </div>
+
             <div className="h-full w-full flex items-center justify-center p-6">
-              <div className="text-white text-center">
-                <h2 className="text-xl font-bold mb-4">EDHEC AI Assistant</h2>
-                <p className="mb-6">
-                  Votre compagnon de préparation aux entretiens
-                </p>
-                {/* Speaking animation circle - more dynamic version */}
-                <div className="relative w-32 h-32 mx-auto flex items-center justify-center">
-                  <motion.div
-                    animate={animationControls}
-                    className="absolute inset-0 bg-white/10 rounded-full"
-                  />
-                  <motion.div
-                    animate={animationControls}
-                    initial={{ scale: 1 }}
-                    style={{ scale: 0.95, originX: 0.5, originY: 0.5 }}
-                    className="absolute inset-1 bg-white/20 rounded-full"
-                  />
-                  <motion.div
-                    animate={animationControls}
-                    initial={{ scale: 1 }}
-                    style={{ scale: 0.9, originX: 0.5, originY: 0.5 }}
-                    className="absolute inset-2 bg-white/30 rounded-full"
-                  />
-                  <motion.div
-                    animate={animationControls}
-                    initial={{ scale: 1 }}
-                    style={{ scale: 0.85, originX: 0.5, originY: 0.5 }}
-                    className="absolute inset-3 bg-white/40 rounded-full"
-                  />
-                  <motion.div
-                    animate={animationControls}
-                    initial={{ scale: 1 }}
-                    style={{ scale: 0.8, originX: 0.5, originY: 0.5 }}
-                    className="absolute inset-4 bg-white/50 rounded-full"
-                  />
-                  <motion.div className="relative z-10 text-white font-medium text-sm">
-                    {conversation.isSpeaking && conversationStarted
-                      ? ""
-                      : "En attente"}
-                  </motion.div>
-                </div>
+              {/* Audio visualization */}
+              <div className="relative w-40 h-40 mx-auto flex items-center justify-center">
+                {conversation.isSpeaking && conversationStarted ? (
+                  <div className="audio-visualizer">
+                    {Array.from({ length: 16 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="audio-bar"
+                        style={{
+                          animationDelay: `${i * 0.05}s`,
+                          height: `${100 - Math.abs(i - 8) * 10}%`,
+                          opacity: 0.7 + Math.min(0.3, i * 0.02),
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="audio-line">
+                    {Array.from({ length: 16 }).map((_, i) => (
+                      <div key={i} className="line-segment" />
+                    ))}
+                  </div>
+                )}
               </div>
+
+              {/* Animated status text that appears at the bottom right */}
+              <motion.div
+                className="absolute bottom-6 right-6 flex items-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={statusTextControls}
+              >
+                <div className="relative w-8 h-8 mr-2 rounded-full overflow-hidden">
+                  <img
+                    src={
+                      interviewType === "corporate"
+                        ? "/lisa.png"
+                        : "/julien.png"
+                    }
+                    alt={getInterviewerName()}
+                    className="w-full h-full object-cover bg-white"
+                  />
+                </div>
+                <AnimatedShinyText className="">
+                  {getInterviewerName()} est en train de parler...
+                </AnimatedShinyText>
+              </motion.div>
             </div>
           </Card>
 
@@ -717,6 +700,52 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* CSS for audio visualization */}
+      <style jsx global>{`
+        /* Audio wave visualizer (when speaking) */
+        .audio-visualizer {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          width: 100%;
+          height: 100%;
+        }
+
+        .audio-bar {
+          width: 4px;
+          background-color: white;
+          border-radius: 2px;
+          animation: audio-wave 0.8s infinite ease-in-out;
+        }
+
+        @keyframes audio-wave {
+          0%,
+          100% {
+            transform: scaleY(0.3);
+          }
+          50% {
+            transform: scaleY(1);
+          }
+        }
+
+        /* Horizontal line (when not speaking) */
+        .audio-line {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          gap: 3px;
+        }
+
+        .line-segment {
+          width: 4px;
+          height: 2px;
+          background-color: white;
+          border-radius: 4px;
+        }
+      `}</style>
     </div>
   );
 }

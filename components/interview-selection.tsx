@@ -81,7 +81,7 @@ export function InterviewSelection({ onStart }: InterviewSelectionProps) {
               </div>
             </CardContent>
             <CardFooter className="pb-4 pt-2">
-              <div className="flex justify-end">
+              <div className="flex justify-end w-full">
                 <Button
                   className={buttonClasses}
                   style={{ backgroundColor: "#A02235", color: "#fff" }}
@@ -128,7 +128,7 @@ export function InterviewSelection({ onStart }: InterviewSelectionProps) {
               </div>
             </CardContent>
             <CardFooter className="pb-4 pt-2">
-              <div className="flex justify-end">
+              <div className="flex justify-end w-full">
                 <Button
                   className={buttonClasses}
                   style={{ backgroundColor: "#A02235", color: "#fff" }}
