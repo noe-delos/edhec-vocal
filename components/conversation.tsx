@@ -446,7 +446,7 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
 
   // Get interviewer name based on interview type
   const getInterviewerName = () => {
-    return interviewType === "corporate" ? "Lisa" : "Julien";
+    return interviewType === "corporate" ? "Lisa" : "Pierre";
   };
 
   return (
@@ -657,7 +657,7 @@ export function Conversation({ interviewType, onBack }: ConversationProps) {
                 src={
                   interviewType === "corporate" ? "/lisa.png" : "/julien.png"
                 }
-                alt={interviewType === "corporate" ? "Lisa" : "Julien"}
+                alt={interviewType === "corporate" ? "Lisa" : "Pierre"}
                 layout="fill"
                 objectFit="cover"
               />
